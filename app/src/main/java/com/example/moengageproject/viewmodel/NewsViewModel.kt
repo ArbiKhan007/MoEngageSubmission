@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.moengageproject.model.Article
 import com.example.moengageproject.model.Response
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +19,10 @@ import java.net.URL
 class NewsViewModel : ViewModel() {
     val newsLiveData: MutableLiveData<List<Article>> = MutableLiveData(emptyList())
 
+    val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
+        throwable.printStackTrace()
+    }
+
     fun callApi() {
         val apiUrl =
             "https://candidate-test-data-moengage.s3.amazonaws.com/Android/news-api-feed/staticResponse.json" //API endpoint
@@ -26,7 +31,7 @@ class NewsViewModel : ViewModel() {
             val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
 
             //Perform Network operation on IO thread
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.IO+coroutineExceptionHandler).launch {
                 //Request method: GET
                 connection.requestMethod = "GET"
 
